@@ -1,0 +1,8 @@
+/node_modules
+/installer/docker/*.html
+/installer/docker/*.js
+/installer/docker/*.css
+/installer/docker/*.gms
+/installer/*.exe
+/installer/*.zip
+/installer/*.db
