@@ -1,9 +1,9 @@
-import { cdrTreeNodeType } from 'VGCore/enums';
+import { VGCore, cdrTreeNodeType } from 'vgcore';
 
 export const loop = (
   root: VGCore.TreeNode,
   modules: any[],
-  update: (output: any) => void
+  update: (output: { [key: string]: number[] }) => void
 ) => {
   const nodes: VGCore.TreeNode[] = [root];
 

@@ -1,12 +1,21 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "commonjs",
+    "module": "esnext",
+    "moduleResolution": "node",
     "removeComments": true,
     "sourceMap": false,
     "baseUrl": "./src",
     "experimentalDecorators": true,
-    "lib": ["dom", "es2015"],
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": false,
+    "noImplicitAny": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "noUnusedLocals": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": ["es6", "dom"],
     "jsx": "react"
   },
   "include": [

@@ -1,20 +1,21 @@
-import { action, observable } from 'mobx';
+import { action, observable, onBecomeObserved } from 'mobx';
 import { loop } from './services';
+import { VGCore } from 'vgcore';
 
-import ColorMdl from './modules/color';
-const MODULES = [ColorMdl];
-const APP = window.external.Application;
+const APP: VGCore.Application = (window.external as any).Application;
 
 class DockerStore {
 
   modules: any[];
-  @observable output: Object = {};
+  @observable output: { [key: string]: number[] };
 
-  constructor() {
-    this.modules = MODULES.map(Mdl => new Mdl());
+  constructor(modules: any[]) {
+    this.modules = modules.map(Mdl => new Mdl());
+    this.output = {};
+    onBecomeObserved(this, 'output', () => this.search());
   }
 
-  @action update = (output: any) => {
+  @action update = (output: { [key: string]: number[] }) => {
     this.output = { ...this.output, ...output };
   };
 

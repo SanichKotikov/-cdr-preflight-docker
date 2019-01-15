@@ -1,4 +1,4 @@
-import { cdrColorType } from 'VGCore/enums';
+import { VGCore, cdrColorType } from 'vgcore';
 
 class ColorMdl {
 

@@ -1,17 +1,26 @@
 const path = require('path');
 const webpack = require('webpack');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
-
-const prod = process.argv.includes('-p');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 const config = {
+  mode: 'development',
+  performance: {
+    hints: false,
+  },
+  stats: {
+    entrypoints: false,
+    children: false,
+  },
   entry: {
-    main: path.resolve(__dirname, 'src', 'index.tsx'),
+    docker: path.resolve(__dirname, 'src', 'index.tsx'),
   },
   output: {
     path: path.resolve(__dirname, 'installer', 'docker'),
-    filename: 'docker.js',
+    filename: '[name].js',
+    chunkFilename: '[name].js',
   },
   resolve: {
     modules: ['node_modules', path.resolve(__dirname, 'src')],
@@ -21,9 +30,9 @@ const config = {
     rules: [
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: "style-loader",
-          use: {
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
             loader: 'css-loader',
             query: {
               modules: true,
@@ -31,8 +40,8 @@ const config = {
               camelCase: true,
               localIdentName: '[hash:base64:5]'
             }
-          }
-        })
+          },
+        ],
       },
       {
         test: /\.ts(x?)$/,
@@ -41,20 +50,60 @@ const config = {
       }
     ]
   },
+  optimization: {
+    minimizer: [],
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          chunks: 'initial',
+          test: path.resolve(__dirname, 'node_modules'),
+          name: 'vendor',
+          enforce: true
+        }
+      }
+    }
+  },
   plugins: [
-    new webpack.optimize.ModuleConcatenationPlugin(),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'src', 'index.html'),
       filename: 'docker.html',
     }),
-    new ExtractTextPlugin('docker.css'),
+    new MiniCssExtractPlugin('docker.css'),
   ],
 };
 
-if (prod) {
-  config.plugins.push(
-    // Remove comments from production build
-    new webpack.optimize.UglifyJsPlugin({ comments: false })
+if (process.env.NODE_ENV === 'production') {
+  config.mode = 'production';
+
+  config.optimization.minimizer.push(
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('production')
+    }),
+    new UglifyJsPlugin({
+      test: /vendor\.js/i,
+      uglifyOptions: {
+        compress: {
+          drop_console: true,
+        },
+        output: {
+          comments: false,
+        },
+      },
+    }),
+    new UglifyJsPlugin({
+      test: /docker\.js/i,
+      uglifyOptions: {
+        compress: {
+          drop_console: true,
+        },
+        output: {
+          beautify: true,
+          indent_level: 2,
+          comments: false,
+        },
+      },
+    }),
+    new OptimizeCSSAssetsPlugin({}),
   );
 }
 

@@ -1,28 +1,25 @@
-import * as React from 'react';
-import * as ReactDOM from "react-dom";
+import React from 'react';
+import ReactDOM from "react-dom";
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
+import modules from './modules';
 import DockerStore from './store';
 
-const store = new DockerStore();
+const store = new DockerStore(modules);
 
 @observer
-class Docker extends React.Component<any, any> {
-
-  componentDidMount() {
-    store.search();
-  }
+class Docker extends React.Component<any> {
 
   render() {
     const output = toJS(store.output);
-    const keys = Object.keys(output);
 
     return (
       <div>
-        {keys.map((key: string) => {
-          const count = output[key].length;
-          return count ? <div key={key}>{key}: {output[key].length}</div> : null;
-        })}
+        {Object.keys(output).map((key: string) => (
+          <div key={key}>
+            {key}: {output[key].length}
+          </div>
+        ))}
       </div>
     );
   }
